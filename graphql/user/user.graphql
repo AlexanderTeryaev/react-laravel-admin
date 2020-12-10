@@ -1,0 +1,82 @@
+interface Account {
+    id: ID!
+    username: String!
+    first_name: String
+    last_name: String
+    avatar_url: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type User implements Account {
+    id: ID!
+    device_id: String
+    username: String!
+    first_name: String
+    last_name: String
+    avatar_url: String
+    curr_app_version: String
+    curr_os: String
+    curr_app_lang: String
+    bio: String
+    one_signal_id: String
+    email: String
+    group: Group
+    groups: [Group]
+    manageable_group: Group
+    manageable_groups: [Group] @method(name: "manageableGroups")
+    questions: [Question] @method(name: "questions")
+    subscriptions(orderBy: [OrderByClause!] @orderBy): [QuizzSubscription] @hasMany(type: "paginator" defaultCount: 10)
+    subscription(id: ID! @eq): QuizzSubscription @hasOne
+    answers(
+        isEnduro: Boolean @builder(method: "App\\UserAnswer@getEnduroAnswers")
+        orderBy: [OrderByClause!] @orderBy): [Answer] @hasMany(type: "paginator" defaultCount: 10)
+    answer(id: ID! @eq): Answer @hasOne
+    stats: Stats! @method(name: "stats")
+    notifications: [Notification] @hasMany(type: "paginator" defaultCount: 10)
+    notification(id: UUID! @eq): Notification @hasOne
+    unreadNotificationsCount: Int! @method(name: "unreadNotificationsCount")
+    is_onboarded: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Learner implements Account {
+    id: ID!
+    username: String!
+    first_name: String
+    last_name: String
+    avatar_url: String
+    curr_os: String
+    curr_app_lang: String
+    bio: String
+    receive_push_notifications: Boolean! @method(name: "receivePushNotifications")
+    email: String @method(name: "getEmail")
+    population: Population @method(name: "getGroupPopulation")
+    subscriptions(orderBy: [OrderByClause!] @orderBy): [QuizzSubscription] @hasMany(type: "paginator" defaultCount: 10)
+    subscription(id: ID! @eq): QuizzSubscription @hasOne
+    answers(
+        isEnduro: Boolean @builder(method: "App\\UserAnswer@getEnduroAnswers")
+        orderBy: [OrderByClause!] @orderBy): [Answer] @hasMany(type: "paginator" defaultCount: 10)
+    answer(id: ID! @eq): Answer @hasOne
+    stats: Stats! @method(name: "stats")
+    enduro_grades: [EnduroGrade] @method(name: "getEnduroGrades")
+    quizz_progress_percentage(quizz_id: ID!): Int! @method(name: "getQuizzProgressPercentage") @QuizzValidation
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type AuthPayload {
+    token: String!
+    viewer: User
+}
+
+input profileInput {
+    first_name: String
+    last_name: String
+    username: String,
+    bio: String,
+    one_signal_id: String,
+    avatar: Upload
+    is_onboarded: Boolean
+}

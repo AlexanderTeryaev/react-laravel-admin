@@ -1,0 +1,8 @@
+type Stats {
+    bad_answers: Int!
+    good_answers: Int!
+    good_answers_rate: Int! @method(name: "goodAnswerRate")
+    app_rank: Int!
+    unlocks: Int!
+    score: Int!
+}

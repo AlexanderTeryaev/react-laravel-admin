@@ -1,0 +1,6 @@
+type EnduroGrade {
+    answered_at: DateTime!
+    score: Int!
+    total: Int!
+    answers: [Answer]
+}

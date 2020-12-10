@@ -1,0 +1,5 @@
+type Subscribers {
+    id: ID!
+    username: String!
+    avatar_url: String
+}

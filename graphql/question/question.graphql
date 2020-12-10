@@ -1,0 +1,23 @@
+type Question {
+    id: ID!
+    quizz: Quizz!
+    question: String!
+    good_answer: String!
+    bad_answer: String!
+    more: String
+    bg_url: String
+    difficulty: String!
+    status: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input QuestionInput {
+    quizz_id: ID
+    question: String
+    good_answer: String
+    bad_answer: String
+    difficulty: String
+    more: String
+    bg: Upload
+}

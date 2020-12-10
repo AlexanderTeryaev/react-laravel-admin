@@ -1,0 +1,20 @@
+type Featured {
+    id: ID!
+    name: String!
+    pic_url: String
+    description: String
+    order_id: Int!
+    is_published: Boolean!
+    quizzes: [Quizz] @hasMany(type: "paginator" defaultCount: 10 scopes:["published"])
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input featuredInput {
+    name: String
+    description: String
+    order_id: Int
+    quizzes: [Int]
+    pic: Upload
+    is_published: Boolean
+}

@@ -1,0 +1,8 @@
+type GroupInvitation {
+    id: ID!
+    population: Population!
+    email: String!
+    accepted_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}

@@ -1,0 +1,14 @@
+type Answer {
+    id: ID!
+    question: Question!
+    result: Boolean!
+    is_enduro: Boolean!
+    answered_at: DateTime!
+}
+
+input submitAnswersInput {
+    question_id: ID! @rules(apply: ["exists:questions,id"])
+    result: Boolean!
+    is_enduro: Boolean!
+    answered_at: DateTime!
+}

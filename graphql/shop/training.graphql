@@ -1,0 +1,59 @@
+type Training {
+    id: ID!
+    name: String!
+    subtitle: String
+    image_url: String
+    description: String
+    difficulty: String!
+    tags: [String]
+    questions_count: Int @method(name: "questionsCount")
+    sample_questions: [ShopQuestion] @method(name: "sampleQuestions")
+    is_purchased: Boolean! @method(name: "isPurchased") @middleware(checks: ["PortalAuth"])
+    quizzes: [ShopQuizz]
+    price: Int!
+    author: ShopAuthor
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type ShopQuizz {
+    id: ID!
+    name: String!
+    image_url: String
+    description: String
+    difficulty: String!
+    questions_count: Int @method(name: "questionsCount")
+    tags: [String]
+    author: ShopAuthor
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type ShopQuestion {
+    id: ID!
+    question: String!
+    bg_url: String
+    more: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type ShopAuthor {
+    id: ID!
+    name: String!
+    function: String!
+    description: String
+    pic_url: String
+    fb_link: String
+    twitter_link: String
+    website_link: String
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type GroupPurchase {
+    id: ID!
+    training: Training!
+    category: Category!
+    price: Int!
+}

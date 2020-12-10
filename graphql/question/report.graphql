@@ -1,0 +1,4 @@
+input submitQuestionReportsInput {
+    question_id: ID! @rules(apply: ["exists:questions,id"])
+    report: String! @rules(apply: ["min:3", "max:255"])
+}

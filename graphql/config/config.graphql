@@ -1,0 +1,4 @@
+type Config {
+    key: String!
+    value: String!
+}

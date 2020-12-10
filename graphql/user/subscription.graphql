@@ -1,0 +1,5 @@
+type QuizzSubscription {
+    id: ID!
+    quizz: Quizz!
+    created_at: DateTime!
+}

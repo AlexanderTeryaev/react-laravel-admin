@@ -1,0 +1,54 @@
+type StripeSubscriptions {
+    stripe_status: String!
+    stripe_plan: String!
+    trial_ends_at: DateTime
+    ends_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type SetupIntent {
+    client_secret: String!
+}
+
+type Invoice {
+    number: String!
+    hosted_invoice_url: String!
+    invoice_pdf: String!
+    total: Float!
+    date: DateTime!
+}
+
+type Card {
+    brand: String!
+    exp_month: Int!
+    exp_year: Int!
+    last4: String!
+}
+
+type Customer {
+    id: ID!
+    address: Address
+    balance: Int!
+    currency: String!
+}
+
+type Address {
+    name: String
+    city: String
+    country: String
+    line1: String
+    line2: String
+    postal_code: String
+    state: String
+}
+
+input addressInput {
+    name: String
+    city: String
+    country: String
+    line1: String
+    line2: String
+    postal_code: String
+    state: String
+}

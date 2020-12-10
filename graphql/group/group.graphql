@@ -1,0 +1,39 @@
+type Group {
+    id: ID!
+    name: String!
+    logo_url: String
+    description: String
+    is_open: Boolean! @method(name: "isOpen")
+    is_current: Boolean! @method(name: "viewerIsCurrent")
+    configs: [Config] @hasMany
+    config(key: String! @eq): Config @hasOne
+
+    is_managing: Boolean! @method(name: "viewerIsManaging")
+    master_key: String! @rename(attribute: "name") @middleware(checks: ["PortalAuth"]) @deprecated(reason: "Master key is in populations")
+    users_limit: Int! @middleware(checks: ["PortalAuth"])
+    trial_ends_at: DateTime! @middleware(checks: ["PortalAuth"])
+    coins: Int! @middleware(checks: ["PortalAuth"])
+    purchases: [GroupPurchase] @middleware(checks: ["PortalAuth"])
+    populations: [Population] @hasMany(type: "paginator" defaultCount: 10)
+
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+
+input createGroupInput {
+    name: String!
+    logo: Upload
+    description: String
+    first_name: String!
+    last_name: String!
+    email: String!
+    phone_number: String!
+    password: String!
+}
+
+input groupInput {
+    name: String
+    description: String
+    logo: Upload
+}

@@ -1,0 +1,48 @@
+type Quizz {
+    id: ID!
+    group: Group!
+    author: Author!
+    name: String!
+    image_url: String
+    default_questions_image: String
+    description: String!
+    viewer_is_subscribed: Boolean! @method(name: "viewerIsSubscribed")
+    subscribers: [Subscribers] @belongsToMany(relation: "users" type: "paginator" defaultCount: 10)
+    questions(search: String, search: String, orderBy: [OrderByClause!] @orderBy): [Question] @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\QuizzQuestionsSearchable" defaultCount: 10)
+    all_questions: [Question] @belongsToMany(relation: "questions")
+    featured: [Featured]
+    categories: [Category] @belongsToMany(relation: "categories", scopes:["published"])
+    questions_count: Int @method(name: "questionsCount")
+    enduro_grades: [EnduroGrade] @method(name: "userEnduroGrades")
+    progress_percentage: Int! @method(name: "userProgressPercentage")
+    overall_success_rate: Int! @method(name: "overallSuccessRate")
+    is_geolocalized: Boolean!
+    latitude: Float
+    longitude: Float
+    radius: Int
+    tags: [String]
+    difficulty: String!
+    enduro_limit: Int!
+    is_published: Boolean!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input quizzInput {
+    name: String
+    description: String
+    author_id: ID
+    image: Upload
+    default_questions_image: Upload
+    categories: [ID]
+    tags: [String]
+    difficulty: String
+    enduro_limit: Int
+    is_geolocalized: Boolean
+    latitude: Float
+    longitude: Float
+    radius: Int
+    is_published: Boolean
+}
+
+

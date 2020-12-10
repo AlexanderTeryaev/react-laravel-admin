@@ -1,0 +1,7 @@
+type AllowedDomain {
+    id: ID!
+    population: Population!
+    domain: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+}

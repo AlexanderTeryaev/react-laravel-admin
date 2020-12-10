@@ -1,0 +1,20 @@
+type Highlight {
+    total_users: Int!
+    last_week_users: Int!
+    total_questions: Int!
+    last_week_questions: Int!
+    total_answer: Int!
+    last_week_answer: Int!
+}
+
+type ChartData {
+    data: [Int]
+    labels: [String]
+}
+
+type AnswersPerDay {
+    total: [Int]
+    right: [Int]
+    wrong: [Int]
+    labels: [String]
+}

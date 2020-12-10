@@ -1,0 +1,22 @@
+type Notification {
+    id: UUID!
+    data: NotificationData
+    read_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type NotificationData {
+    subject: String!
+    body: String!
+    screen: String
+    target_id: Int
+    group: GroupInfo!
+    should_switch: Boolean
+}
+
+type GroupInfo {
+    id: ID!
+    name: String!
+    logo_url: String
+}

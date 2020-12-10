@@ -1,0 +1,17 @@
+type Plan {
+    id: ID!
+    name: String!
+    features: [String]
+    price: Float
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type CoinsPack {
+    id: ID!
+    name: String!
+    coins_quantity: Int!
+    price: Float
+    created_at: DateTime!
+    updated_at: DateTime!
+}

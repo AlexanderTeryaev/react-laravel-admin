@@ -1,0 +1,17 @@
+/node_modules
+/public/hot
+/public/storage
+/public/images
+/public/css
+/public/js
+/public/*.js
+/public/mix-manifest.json
+/public/dist
+/storage/*.key
+/vendor
+/.vagrant
+Homestead.json
+Homestead.yaml
+npm-debug.log
+.env
+

@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: old-prod
+  labels:
+    app: backend
+  name: backend-config
+
+data:
+  APP_NAME: "MRMLD BO"
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  APP_URL: "https://bo.marmelade-app.fr"
+
+  LOG_CHANNEL: "prod"
+  BROADCAST_DRIVER: "log"
+  CACHE_DRIVER: "redis"
+  MAIL_DRIVER: "ses"
+  SESSION_DRIVER: "redis"
+  SESSION_LIFETIME: "120"
+  QUEUE_DRIVER: "sync"
+  FILESYSTEM_DRIVER: "s3"
+
+  DB_CONNECTION: "mysql"
+  DB_PORT: "3306"
+  DB_HOST: "db-test.cismxf0nbec3.eu-west-3.rds.amazonaws.com"
+
+  REDIS_HOST: "marmelade.z0sppo.0001.euw3.cache.amazonaws.com"
+
+  LIGHTHOUSE_DOMAIN: "https://bo.marmelade-app.fr"
+  LIGHTHOUSE_URI: "/graphql"
+
+  AWS_DEFAULT_REGION: "eu-west-1"
+  AWS_SES_DEFAULT_REGION: "eu-west-1"
+  AWS_BUCKET: "images.marmelade-app.fr"
+  IMAGES_URL: "https://images.marmelade-app.fr/"
+
+  CASHIER_MODEL: "App\\Group"
+  CASHIER_CURRENCY: "eur"
+  CASHIER_CURRENCY_LOCALE: "fr_FR"

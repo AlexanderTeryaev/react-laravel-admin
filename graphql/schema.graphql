@@ -1,0 +1,184 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+"Can be used as an argument to upload files using https://github.com/jaydenseric/graphql-multipart-request-spec"
+scalar Upload @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
+"A UUID string must be a valid 128-bit number that respects the https://tools.ietf.org/html/rfc4122."
+scalar UUID @scalar(class: "App\\GraphQL\\Scalars\\UUID")
+
+#import group/*.graphql
+#import user/*.graphql
+#import quizz/*.graphql
+#import question/*.graphql
+#import author/*.graphql
+#import featured/*graphql
+#import category/*graphql
+#import contact/*graphql
+#import faq/*graphql
+#import blog/*graphql
+#import plan/*graphql
+#import press/*graphql
+#import config/*graphql
+#import shop/*graphql
+
+type Query {
+    checkEmailAvailable(email: String! @rules(apply: ["email"])): Boolean
+    plans: [Plan] @all(model: "Plan")
+    plan(id: ID! @eq): Plan @find(model: "Plan")
+    configs: [Config] @all(model: "Config")
+    config(key: String! @eq): Config  @find(model: "Config")
+}
+
+type Mutation {
+    createGroup(input: createGroupInput): Boolean @CreateGroupValidation
+    verifyEmail(email: String! @rules(apply: ["email"]), token: String!): Boolean
+    login(email: String! @rules(apply: ["email"]), password: String!): AuthPayload
+    refreshToken(token: String!): AuthPayload
+    sendPasswordResetEmail(email: String! @rules(apply: ["email"])): Boolean
+    resetPassword(token: String!, email: String! @rules(apply: ["email"]), password: String! @rules(apply: ["min:8"])): Boolean
+
+    sendLoginCode(email: String! @rules(apply: ["email"])): Boolean
+    loginWithEmail(email: String! @rules(apply: ["email"]), code: String!): AuthPayload
+    sendRegisterCode(email: String! @rules(apply: ["email"])): Boolean
+    registerWithEmail(email: String! @rules(apply: ["email"]), code: String!): AuthPayload
+}
+
+extend type Query @middleware(checks: "AuthUserGql") {
+    viewer: User
+    quizzes(search: String, orderBy: [OrderByClause!] @orderBy): [Quizz!]! @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\QuizzesSearchable" defaultCount: 10)
+    quizz(id: ID! @eq): Quizz @find(model: "Quizz" scopes:["published"])
+    questions(search: String, orderBy: [OrderByClause!] @orderBy): [Question!]! @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\QuestionsSearchable" defaultCount: 10)
+    question(id: ID! @eq): Question @find(model: "Question")
+    authors(search: String, orderBy: [OrderByClause!] @orderBy): [Author!]! @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\AuthorsSearchable" defaultCount: 10)
+    author(id: ID! @eq): Author @find(model: "Author")
+    featured(is_published: Boolean): [Featured]
+    getFeatured(id: ID! @eq): Featured @find(model: "Featured")
+    categories(search: String, orderBy: [OrderByClause!] @orderBy): [Category!]! @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\CategoriesSearchable" defaultCount: 10)
+    category(id: ID! @eq): Category @find(model: "Category" scopes:["published"])
+    popularQuizzes(weekly: Boolean! limit: Int): [Quizz] @all(scopes:["popular"])
+    digDeeper(category_ids: [ID] @rules(apply: ["exists:categories,id"]), orderBy: [OrderByClause!] @orderBy): [Answer] @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\DigDeeper" defaultCount: 10)
+}
+
+extend type Mutation @middleware(checks: "AuthUserGql") {
+    subscribeCategoryQuizzes(category_id: ID! @rules(apply: ["exists:categories,id"])): [QuizzSubscription]
+    subscribeQuizz(quizz_id: ID! @rules(apply: ["exists:quizzes,id"])): QuizzSubscription
+    unsubscribeQuizz(quizz_id: ID! @rules(apply: ["exists:quizzes,id"])): QuizzSubscription
+    submitAnswers(input: [submitAnswersInput!]): [Answer]
+    submitQuestionReports(input: [submitQuestionReportsInput!]!): Boolean
+    submitContactRequest(input: submitContactRequestInput!): Boolean
+
+    updateProfile(input: profileInput! @spread): User @ProfileValidation
+
+    updateUsername(username: String!): User @ProfileValidation @deprecated(reason: "Use updateProfile instead, which is partial update")
+    updateBio(bio: String): User @ProfileValidation @deprecated(reason: "Use updateProfile instead, which is partial update")
+    updateOneSignalId(player_id: String): User @ProfileValidation @deprecated(reason: "Use updateProfile instead, which is partial update")
+    uploadAvatar(avatar: Upload!): User @ProfileValidation @deprecated(reason: "Use updateProfile instead, which is partial update")
+
+    setNotificationsAsRead: Boolean!
+    setNotificationAsRead(notification_id: UUID!): Boolean!
+    switchGroup(group_id: ID! @rules(apply: ["exists:groups,id"])): Group
+    sendGroupEmailVerification(email: String! @rules(apply: ["email"])): Boolean
+    joinGroup(code: String! @rules(apply: ["between:5,36"]), switch: Boolean): [Group]
+    leaveGroup(group_id: ID! @rules(apply: ["exists:groups,id"]), delete_data: Boolean): Group
+}
+
+extend type Query @middleware(checks: ["AuthUserGql", "PortalAuth"]) {
+    user(id: ID @rules(apply: ["exists:users,id"])): Learner
+    users(
+        search: String
+        population_ids: [ID]
+        curr_os: String @rules(apply: ["nullable","in:ios,android"])
+        withEmail: Boolean
+        orderBy: [OrderByClause!] @orderBy
+    ): [Learner] @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\Users" defaultCount: 10)
+
+
+    populations: [Population] @paginate(type: "paginator" model: "GroupPopulation" defaultCount: 10)
+    population(id: ID! @eq): Population @find(model: "GroupPopulation")
+
+    invitations(
+        search: String @scope(name: "search")
+        population_id: ID @scope(name: "Population")
+        pending: Boolean @scope(name: "pending")
+        orderBy: [OrderByClause!] @orderBy
+    ): [GroupInvitation] @paginate(type: "paginator" model: "GroupInvitation" defaultCount: 10)
+
+    allowed_domains(
+        search: String @scope(name: "search")
+        population_id: ID @scope(name: "Population")
+    ): [AllowedDomain] @all(model: "GroupAllowedDomain")
+
+    highlights: Highlight
+    platformSpread(start: DateTime, end: DateTime): ChartData
+    answerSpread(start: DateTime, end: DateTime): ChartData
+    answersPerDay(start: DateTime, end: DateTime): AnswersPerDay
+
+    subscription: StripeSubscriptions
+    invoices: [Invoice]
+    defaultCard: Card
+    customer: Customer
+
+    trainings: [Training] @paginate(type: "paginator" model: "ShopTraining" defaultCount: 10)
+    training(id: ID! @eq): Training @find(model: "ShopTraining")
+
+    coinsPacks: [CoinsPack] @all(model: "CoinsPack")
+    coinsPack(id: ID! @eq): CoinsPack @find(model: "CoinsPack")
+}
+
+extend type Mutation @middleware(checks: ["AuthUserGql", "PortalAuth"]){
+    createPopulation(input: populationInput): Population @PopulationValidation
+    updatePopulation(population_id: ID!, input: populationInput): Population @PopulationValidation
+    deletePopulation(population_id: ID!): Population @delete(model: "GroupPopulation") @PopulationValidation
+    movePopulationUsers(user_ids: [ID], population_src: ID, population_dest: ID!): Int @MovePopulationValidation
+
+    createGroupInvitations(population_id: ID!, emails: [String!]!): [GroupInvitation] @GroupInvitationValidation
+    resendGroupInvitation(invitation_id: ID!): GroupInvitation @GroupInvitationValidation
+    deleteGroupInvitation(invitation_id: ID!): GroupInvitation @delete @GroupInvitationValidation
+
+    createAllowedDomain(population_id: ID!, domain: String!): AllowedDomain @AllowedDomainValidation
+    deleteAllowedDomain(domain_id: ID!) : AllowedDomain @delete(model: "GroupAllowedDomain") @AllowedDomainValidation
+
+    kickUsers(user_ids: [ID], delete_data: Boolean): [ID] @KickUsersValidation
+    subscribeUsers(user_ids: [ID], quizz_ids: [ID]!): [ID] @SubscribeUsersValidation
+
+    notifyUsers(user_ids: [ID], population_id: ID, body: String!): Boolean @NotifyUsersValidation
+    newQuizzNotification(quizz_id: ID @rules(apply: ["exists:quizzes,id"])): Boolean
+
+    createSetupIntent: SetupIntent!
+    newSubscription(plan_id: ID! @rules(apply: ["exists:plans,id"]), payment_method: String!): StripeSubscriptions!
+    updateDefaultCard(payment_method: String!): Card!
+    deleteCards: Boolean!
+    cancelSubscription: StripeSubscriptions
+    updateAddress(input: addressInput @spread): Address
+
+    buyTraining(training_id: ID! @rules(apply: ["exists:shop_trainings,id"])): GroupPurchase
+
+    buyCoinsPack(coins_pack_id: ID!): Boolean!
+
+    logout: Boolean
+    updatePassword(current_password: String!, new_password: String!): Boolean @UpdatePasswordValidation
+    switchManageableGroup(group_id: ID! @rules(apply: ["exists:groups,id"])): Group
+
+    createQuizz(input: quizzInput!): Quizz @QuizzValidation
+    updateQuizz(quizz_id: ID!, input: quizzInput!): Quizz @QuizzValidation
+    deleteQuizz(quizz_id: ID!): Quizz @delete @QuizzValidation
+
+    createCategory(input: categoryInput!): Category @CategoryValidation
+    updateCategory(category_id: ID!, input: categoryInput!, sync_quizz_publishing: Boolean): Category @CategoryValidation
+    deleteCategory(category_id: ID!): Category @delete @CategoryValidation
+
+    createQuestion(useDefaultImage: Boolean!, input: QuestionInput!): Question @QuestionValidation
+    updateQuestion(question_id: ID!, useDefaultImage: Boolean!, input: QuestionInput!): Question @QuestionValidation
+    deleteQuestion(question_id: ID!): Question @delete @QuestionValidation
+
+    createFeatured(input: featuredInput!): Featured @FeaturedValidation
+    updateFeatured(featured_id: ID!, input: featuredInput!): Featured @FeaturedValidation
+    deleteFeatured(featured_id: ID!): Featured @delete @FeaturedValidation
+
+    createAuthor(input: authorInput!): Author @AuthorValidation
+    updateAuthor(author_id: ID!, input: authorInput!) : Author @AuthorValidation
+    deleteAuthor(author_id: ID!): Author @delete @AuthorValidation
+
+    updateGroup(input: groupInput @spread): Group @GroupValidation
+}

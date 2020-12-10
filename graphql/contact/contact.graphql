@@ -1,0 +1,6 @@
+input submitContactRequestInput {
+    name: String! @rules(apply: ["max:255"])
+    email: String! @rules(apply: ["email"])
+    subject: String! @rules(apply: ["max:255"])
+    message: String! @rules(apply: ["min:10"])
+}

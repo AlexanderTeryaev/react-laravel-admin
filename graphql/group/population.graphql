@@ -1,0 +1,17 @@
+type Population {
+    id: ID!
+    name: String!
+    description: String
+    master_key: String!
+    is_enabled: Boolean!
+    users: [Learner] @belongsToMany(type: "paginator" defaultCount: 10)
+    overall_success_rate: Int! @method(name: "overallSuccessRate")
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input populationInput {
+    name: String
+    description: String
+    is_enabled: Boolean
+}

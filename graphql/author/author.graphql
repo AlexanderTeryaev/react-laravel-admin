@@ -1,0 +1,24 @@
+type Author {
+    id: ID!
+    name: String!
+    function: String!
+    description: String
+    pic_url: String
+    fb_link: String
+    twitter_link: String
+    website_link: String
+    quizzes: [Quizz] @hasMany(type: "paginator" defaultCount: 10 scopes:["published"])
+    questions: [Question] @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\AuthorQuestions" defaultCount: 10)
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input authorInput {
+    name: String
+    function: String
+    pic: Upload
+    description: String
+    fb_link: String
+    twitter_link: String
+    website_link: String
+}

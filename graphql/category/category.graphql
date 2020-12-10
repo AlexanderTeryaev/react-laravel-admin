@@ -1,0 +1,16 @@
+type Category {
+    id: ID!
+    name: String!
+    logo_url: String
+    is_published: Boolean!
+    quizzes(search: String, orderBy: [OrderByClause!] @orderBy): [Quizz] @paginate(type: "paginator" builder: "App\\GraphQL\\Queries\\CategoryQuizzesSearchable" defaultCount: 10)
+    viewer_sub_quizzes: Int! @method(name: "subQuizzesCount")
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+input categoryInput {
+    name: String
+    logo: Upload
+    is_published: Boolean
+}
